@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-
 const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization; // Get the Authorization header
 
@@ -17,7 +16,9 @@ const authMiddleware = async (req, res, next) => {
     req.user = await User.findById(decoded.id).select('-password'); // Get the user from the database
     next(); // Proceed to the next middleware or route handler
   } catch (error) {
+    console.error('Auth Middleware Error:', error);
     return res.status(401).json({ message: 'Token is not valid' });
   }
 };
+
 module.exports = authMiddleware;
