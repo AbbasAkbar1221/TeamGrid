@@ -20,9 +20,9 @@ const taskRoutes = require('./routes/taskRoutes');
 
 
 // Use routes
-app.use('/api/users', userRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/tasks', taskRoutes);
+app.use('/users', userRoutes);
+app.use('/projects', projectRoutes);
+app.use('/tasks', taskRoutes);
 
 
 // Define a simple route for the home page
@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 
 
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
