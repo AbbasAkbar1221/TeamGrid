@@ -47,7 +47,15 @@ const createTask = async (req, res) => {
 const getTasksByProject = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const tasks = await Task.find({ project: projectId }).populate('assignedTo');
+    const tasks = await Task.find({ project: projectId })
+    .populate({
+      path: 'project', // Populate the project field
+      select: 'title' // Specify which fields to include from the project
+    })
+    .populate({
+      path: 'assignedTo', // Populate the assignedTo field
+      select: 'username' // Specify which fields to include from the user
+    });
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -57,7 +65,9 @@ const getTasksByProject = async (req, res) => {
 // Get a single task by ID
 const getTaskById = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.id).populate('assignedTo project');
+    const task = await Task.findById(req.params.id)
+    .populate('assignedTo','username')
+    .populate('project','title');
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
     }
@@ -98,8 +108,8 @@ const deleteTask = async (req, res) => {
 
     // Remove the task from the associated project
     await Project.updateOne(
-      { tasks: req.params.id },
-      { $pull: { tasks: req.params.id } }
+      { tasks: req.params.id },    // Find the project that contains the task
+      { $pull: { tasks: req.params.id } }   // Remove the task from the project's task list
     );
 
     res.status(200).json({ message: 'Task deleted successfully' });

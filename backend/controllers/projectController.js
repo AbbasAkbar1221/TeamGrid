@@ -31,17 +31,31 @@ const createProject = async (req, res) => {
 // Get all projects
 const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().populate('manager teamMembers tasks');
+    const projects = await Project.find()
+      .populate('manager', 'username')        // Only populate the 'name' field from the 'manager' reference
+      .populate('teamMembers', 'username')    // Populate only 'name' for team members
+      .populate('tasks');                 // Populate all task fields (customize as needed)
+
+    // Optionally, handle case where no projects are found
+    if (!projects || projects.length === 0) {
+      return res.status(404).json({ message: 'No projects found' });
+    }
+
+    // Return the populated project data
     res.status(200).json(projects);
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
+
 // Get a single project by ID
 const getProjectById = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id).populate('manager teamMembers tasks');
+    const project = await Project.findById(req.params.id)
+    .populate('manager', 'username')        
+    .populate('teamMembers', 'username')    
+    .populate('tasks');
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
